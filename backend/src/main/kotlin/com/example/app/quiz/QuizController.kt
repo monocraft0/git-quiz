@@ -26,5 +26,5 @@ class QuizController(
     fun answer(
         @PathVariable id: Long,
         @Valid @RequestBody request: AnswerRequest,
-    ): AnswerResultDto = TODO("not implemented")
+    ): AnswerResultDto = quizService.judgeAnswer(id, request.selectedIndex)
 }

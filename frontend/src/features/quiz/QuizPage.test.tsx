@@ -71,4 +71,25 @@ describe('QuizPage', () => {
     await waitFor(() => expect(screen.getByText('不正解')).toBeInTheDocument());
     expect(screen.getByText('git add はステージングに追加します。')).toBeInTheDocument();
   });
+
+  it('「次の問題へ」ボタンをクリックすると次の質問文が表示される', async () => {
+    const user = userEvent.setup();
+    mockedGet.mockResolvedValueOnce(questions);
+    const answerResult: AnswerResultDto = {
+      correct: true,
+      correctIndex: 0,
+      explanation: 'git add はステージングに追加します。',
+    };
+    mockedPost.mockResolvedValueOnce(answerResult);
+
+    render(<QuizPage />);
+    await waitFor(() => expect(screen.getByText('Q1: git add とは？')).toBeInTheDocument());
+
+    await user.click(screen.getByRole('button', { name: 'ステージング' }));
+    await waitFor(() => expect(screen.getByText('正解')).toBeInTheDocument());
+
+    await user.click(screen.getByRole('button', { name: '次の問題へ' }));
+
+    await waitFor(() => expect(screen.getByText('Q2: git commit とは？')).toBeInTheDocument());
+  });
 });

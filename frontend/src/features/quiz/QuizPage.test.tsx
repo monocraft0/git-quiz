@@ -125,4 +125,10 @@ describe('QuizPage', () => {
     expect(screen.queryByText('Q2: git commit とは？')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: '次の問題へ' })).not.toBeInTheDocument();
   });
+
+  it('失敗系: api.get が reject したときエラーメッセージが表示される', async () => {
+    mockedGet.mockRejectedValueOnce(new Error('boom'));
+    render(<QuizPage />);
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('boom'));
+  });
 });

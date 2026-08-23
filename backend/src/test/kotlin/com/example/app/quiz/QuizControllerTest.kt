@@ -69,4 +69,21 @@ class QuizControllerTest(
             jsonPath("$.explanation") { value("git add はステージングに追加します。") }
         }
     }
+
+    @Test
+    fun `POST api quiz questions id answer with wrong index returns correct false`() {
+        every { quizService.judgeAnswer(1, 3) } returns AnswerResultDto(
+            correct = false,
+            correctIndex = 0,
+            explanation = "git add はステージングに追加します。",
+        )
+
+        mockMvc.post("/api/quiz/questions/1/answer") {
+            contentType = MediaType.APPLICATION_JSON
+            content = """{"selectedIndex":3}"""
+        }.andExpect {
+            status { isOk() }
+            jsonPath("$.correct") { value(false) }
+        }
+    }
 }

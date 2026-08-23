@@ -100,4 +100,15 @@ class QuizControllerTest(
             jsonPath("$.message") { value("quiz question not found: 999") }
         }
     }
+
+    @Test
+    fun `POST api quiz questions id answer with out of range selectedIndex returns 400`() {
+        mockMvc.post("/api/quiz/questions/1/answer") {
+            contentType = MediaType.APPLICATION_JSON
+            content = """{"selectedIndex":4}"""
+        }.andExpect {
+            status { isBadRequest() }
+            jsonPath("$.code") { value("VALIDATION_ERROR") }
+        }
+    }
 }

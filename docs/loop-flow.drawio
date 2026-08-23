@@ -1,0 +1,206 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="loop-flow" name="ループ1周">
+    <mxGraphModel dx="1100" dy="1500" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="1980" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="title" value="ループ1周（/work-next）の流れ" style="text;html=1;fontSize=20;fontStyle=1;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="40" y="10" width="480" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="subtitle" value="典拠: .loop/LOOP.md（完了条件・モデル配分・赤を先に見る・ADR） / .claude/commands/work-next.md / .claude/agents/*.md / .claude/skills/tdd/SKILL.md / .claude/skills/adr/SKILL.md" style="text;html=1;fontSize=11;fontColor=#666666;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="40" y="52" width="760" height="24" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="n1" value="人が書く&lt;br&gt;&lt;font style='font-size:10px;color:#666666'&gt;新機能・仕様変更はこの経路だけ&lt;/font&gt;" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="170" y="90" width="230" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="n2" value="/find-work&lt;br&gt;&lt;font style='font-size:10px;color:#666666'&gt;テスト失敗 / TODO・FIXME を走査&lt;br&gt;同じ source: は積まない&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="560" y="86" width="280" height="68" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="n3" value=".loop/backlog.md&lt;br&gt;&lt;font style='font-size:10px;color:#666666'&gt;仕事の源泉。上から1件ずつ取る&lt;/font&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=14;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="375" y="210" width="270" height="90" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="n4" value="前提確認&lt;br&gt;&lt;font style='font-size:10px;color:#666666'&gt;git status が空か&lt;br&gt;base が loop/ でないか&lt;/font&gt;" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="370" y="350" width="280" height="120" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="n12" value="着手せず終了&lt;br&gt;&lt;font style='font-size:10px;color:#666666'&gt;reset/clean で巻き込む危険があるため&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="740" y="378" width="250" height="64" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="n5" value="先頭の - [ ] を1件取る&lt;br&gt;&lt;font style='font-size:10px;color:#666666'&gt;blocked: 付きの行は飛ばす&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="380" y="520" width="260" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="n13" value="バックログが空&lt;br&gt;&lt;font style='font-size:10px;color:#666666'&gt;何も作らずに終了&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="740" y="525" width="250" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="n6" value="git switch -c loop/&amp;lt;slug&amp;gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="380" y="640" width="260" height="56" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="n18" value="分解&amp;nbsp;&lt;font style='font-size:10px;color:#9673a6'&gt;&lt;b&gt;opus&lt;/b&gt;（/work-next 本体）&lt;/font&gt;&lt;br&gt;&lt;font style='font-size:10px;color:#666666'&gt;スライスに割る / 触るディレクトリと完了の形を決める&lt;br&gt;&lt;b&gt;テストリストを作る&lt;/b&gt;（見て確かめること → 実行できるテスト）&lt;br&gt;db: の行き先（postgres | dynamo | none）を確定&lt;br&gt;&lt;b&gt;ここで実装コードは書かない&lt;/b&gt;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="345" y="730" width="330" height="100" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="n7" value="委譲 — 実装はサブエージェントに渡す&lt;br&gt;&lt;font style='font-size:10px;color:#666666'&gt;本体は原則 Write / Edit しない&lt;br&gt;&lt;b&gt;赤 → 緑 → リファクタ&lt;/b&gt;を1件ずつ回させる&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;verticalAlign=top;spacingTop=6;" vertex="1" parent="1">
+          <mxGeometry x="340" y="890" width="340" height="150" as="geometry"/>
+        </mxCell>
+        <mxCell id="n7a" value="backend-dev&lt;br&gt;&lt;font style='font-size:10px;color:#6c8ebf'&gt;&lt;b&gt;sonnet&lt;/b&gt;&lt;/font&gt;&lt;br&gt;&lt;font style='font-size:9px;color:#666666'&gt;controller / service&lt;br&gt;repository / migration&lt;br&gt;test: … — red を先にコミット&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="n7">
+          <mxGeometry x="15" y="58" width="145" height="78" as="geometry"/>
+        </mxCell>
+        <mxCell id="n7b" value="frontend-dev&lt;br&gt;&lt;font style='font-size:10px;color:#6c8ebf'&gt;&lt;b&gt;sonnet&lt;/b&gt;&lt;/font&gt;&lt;br&gt;&lt;font style='font-size:9px;color:#666666'&gt;component / hook&lt;br&gt;types / Vitest&lt;br&gt;test: … — red を先にコミット&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="n7">
+          <mxGeometry x="180" y="58" width="145" height="78" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="n20" value="機械的なタスクは同じエージェントを&lt;br&gt;&lt;font style='font-size:11px;color:#999999'&gt;&lt;b&gt;model: haiku&lt;/b&gt;&lt;/font&gt; で起動&lt;br&gt;&lt;font style='font-size:9px;color:#666666'&gt;TODO削除 / リネーム / 定型テスト / 1ファイルの小修正&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#999999;dashed=1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="730" y="915" width="250" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="n22" value="ADR&amp;nbsp;&lt;font style='font-size:10px;color:#9673a6'&gt;&lt;b&gt;opus&lt;/b&gt;（/work-next 本体）&lt;/font&gt;&lt;br&gt;&lt;font style='font-size:10px;color:#666666'&gt;設計判断を含む周だけ。docs/adr/ に1件書く&lt;br&gt;枝の上に置き、実装と同じコミットに入れる&lt;br&gt;&lt;b&gt;実装エージェントに委譲しない&lt;/b&gt;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="345" y="1080" width="330" height="100" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="n23" value="ADRも赤もゲートを増やさない&lt;br&gt;&lt;br&gt;完了条件は機械ゲート / レビュー合否 /&lt;br&gt;出力ゲートの3つ。ADRは code-reviewer の&lt;br&gt;チェック観点に、赤は機械ゲートの&lt;br&gt;1項目（着手条件）として乗るだけ。&lt;br&gt;&lt;br&gt;基準は .claude/skills/adr/SKILL.md。&lt;br&gt;命名や規約どおりの実装まで求めない&lt;br&gt;（誤爆は差し戻し3回を溶かす）。" style="shape=note;whiteSpace=wrap;html=1;size=14;backgroundOutline=1;fillColor=#ffffff;strokeColor=#9673a6;align=left;verticalAlign=top;spacing=8;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="730" y="1060" width="290" height="140" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="n8" value="機械ゲート&lt;br&gt;make test &amp;amp;&amp;amp; make build&lt;br&gt;&lt;font style='font-size:10px;color:#666666'&gt;赤の記録（test: … — red）も確認する&lt;/font&gt;" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="360" y="1260" width="300" height="120" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="n9" value="verifier: code-reviewer&amp;nbsp;&lt;font style='font-size:10px;color:#9673a6'&gt;&lt;b&gt;opus&lt;/b&gt;&lt;/font&gt;&lt;br&gt;&lt;font style='font-size:10px;color:#666666'&gt;別エージェント。1行目に判定&lt;br&gt;赤コミットを複製上で再現する&lt;br&gt;実装したモデルにPASSを出させない&lt;/font&gt;" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#9673a6;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="355" y="1440" width="310" height="130" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="n10" value="記録&lt;br&gt;&lt;font style='font-size:10px;color:#666666'&gt;commit → base へ戻る → merge --no-ff&lt;br&gt;backlog から削除 → done.md に追記&lt;br&gt;枝は消さない&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="370" y="1630" width="280" height="110" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="n11" value="1周おわり" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="430" y="1810" width="160" height="52" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="n14" value="blocked（どちらかのゲートで3回超過）&lt;br&gt;&lt;font style='font-size:10px;color:#666666'&gt;git reset --hard → git clean -fd&lt;br&gt;git switch base → git branch -D&lt;br&gt;backlog に blocked: の理由を追記&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="730" y="1290" width="290" height="150" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="n15" value="ループを停止し人へ報告&lt;br&gt;&lt;font style='font-size:10px;color:#666666'&gt;残すのはコードでなく理由&lt;/font&gt;" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="745" y="1520" width="260" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="n19" value="モデル配分（.loop/LOOP.md）&lt;br&gt;&lt;br&gt;1周のなかで難しさは一様ではない。&lt;br&gt;難しいのは分解と判断で、実装の&lt;br&gt;キーストロークではない。&lt;br&gt;&lt;br&gt;&lt;b&gt;opus&lt;/b&gt;　分解 / 依存の判断 / 統合 /&lt;br&gt;　　　　差し戻しの原因特定 / 合否判定&lt;br&gt;&lt;b&gt;sonnet&lt;/b&gt;　backend-dev / frontend-dev&lt;br&gt;&lt;b&gt;haiku&lt;/b&gt;　判断の要らない機械的な作業&lt;br&gt;&lt;br&gt;本体の model は .claude/settings.json、&lt;br&gt;既定は各 agents/*.md の frontmatter。&lt;br&gt;haiku は呼び出しごとの判断なので&lt;br&gt;設定に書かず /work-next が渡す。&lt;br&gt;&lt;br&gt;オーケストレータが自分で実装を&lt;br&gt;書き始めたら、この配分は壊れている。" style="shape=note;whiteSpace=wrap;html=1;size=14;backgroundOutline=1;fillColor=#ffffff;strokeColor=#9673a6;align=left;verticalAlign=top;spacing=8;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="30" y="700" width="250" height="330" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="n16" value="ゲートの出力はフックで絞られる&lt;br&gt;&lt;br&gt;PreToolUse → run-gate.sh&lt;br&gt;成功 = 1行 / 失敗 = 抜粋のみ&lt;br&gt;全文は .logs/gate.log" style="shape=note;whiteSpace=wrap;html=1;size=14;backgroundOutline=1;fillColor=#ffffff;strokeColor=#999999;align=left;verticalAlign=top;spacing=8;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="30" y="1260" width="250" height="120" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="n21" value="差し戻しの分岐（本体 = opus）&lt;br&gt;&lt;br&gt;原因が1〜2行で言い切れる&lt;br&gt;　→ 自分で直す（往復のほうが高い）&lt;br&gt;それ以外&lt;br&gt;　→ 担当エージェントへ差し戻す&lt;br&gt;　　（何がどう落ちたかを添えて）" style="shape=note;whiteSpace=wrap;html=1;size=14;backgroundOutline=1;fillColor=#ffffff;strokeColor=#b85450;align=left;verticalAlign=top;spacing=8;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="30" y="1420" width="250" height="130" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="n17" value="ループの禁止事項（抜粋）&lt;br&gt;&lt;br&gt;push / PR は作らない&lt;br&gt;base はローカルに閉じる&lt;br&gt;枝は残す（差分を読み返せるように）" style="shape=note;whiteSpace=wrap;html=1;size=14;backgroundOutline=1;fillColor=#ffffff;strokeColor=#999999;align=left;verticalAlign=top;spacing=8;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="30" y="1630" width="250" height="110" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#6c8ebf;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.25;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="n1" target="n3">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#6c8ebf;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.75;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="n2" target="n3">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#666666;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="n3" target="n4">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e4" value="OK" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#666666;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="n4" target="n5">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e5" value="汚れている / base が loop/" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;strokeColor=#666666;fontSize=10;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="n4" target="n12">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#666666;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="n5" target="n6">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e7" value="未完了行なし" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;strokeColor=#666666;fontSize=10;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="n5" target="n13">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#666666;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="n6" target="n18">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e19" value="スライスごとの指示文&lt;br&gt;（範囲 / 触ってよいディレクトリ / 読む SKILL.md / 完了条件）" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#9673a6;fontSize=10;fontColor=#9673a6;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="n18" target="n7">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e20" value="実際のDTOの形を&lt;br&gt;指示に埋める（直列）" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#6c8ebf;fontSize=9;fontColor=#6c8ebf;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="n7a" target="n7b">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e21" value="機械的なら" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;strokeColor=#999999;fontSize=10;fontColor=#999999;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="n7" target="n20">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#666666;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="n7" target="n22">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e22" value="設計判断を含まないなら素通り" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#666666;fontSize=10;fontColor=#666666;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="n22" target="n8">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e10" value="緑" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#82b366;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="n8" target="n9">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e11" value="赤 → 原因特定は本体&lt;br&gt;差し戻し（最大3回）" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#b85450;fontSize=10;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.35;entryDx=0;entryDy=0;" edge="1" parent="1" source="n8" target="n7">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="320" y="1320"/>
+              <mxPoint x="320" y="943"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e12" value="PASS" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#82b366;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="n9" target="n10">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e13" value="FAIL（ADR以外）→ Blocker の&lt;br&gt;原文を担当へ差し戻し（最大3回）" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#b85450;fontSize=10;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.85;entryDx=0;entryDy=0;" edge="1" parent="1" source="n9" target="n7">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="300" y="1505"/>
+              <mxPoint x="300" y="1018"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e23" value="ADRのBlockerは&lt;br&gt;差し戻さず本体が書く" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;strokeColor=#9673a6;fontSize=10;fontColor=#9673a6;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="n9" target="n22">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="700" y="1472"/>
+              <mxPoint x="700" y="1130"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e14" value="3回超過" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#b85450;fontSize=10;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" source="n8" target="n14">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e15" value="3回超過" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#b85450;fontSize=10;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" edge="1" parent="1" source="n9" target="n14">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#b85450;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="n14" target="n15">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#82b366;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="n10" target="n11">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e18" value="次の周へ（文脈はリセットされ、.loop/ が引き継ぐ）" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;strokeColor=#9673a6;fontSize=10;fontColor=#9673a6;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="n11" target="n3">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1090" y="1836"/>
+              <mxPoint x="1090" y="255"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

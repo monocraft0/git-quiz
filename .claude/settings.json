@@ -1,0 +1,44 @@
+{
+  "model": "opus",
+  "permissions": {
+    "allow": [
+      "Bash(make test)",
+      "Bash(make test-backend)",
+      "Bash(make test-frontend)",
+      "Bash(make gate)",
+      "Bash(make build)",
+      "Bash(make status)",
+      "Bash(make start)",
+      "Bash(cd backend && ./gradlew test:*)",
+      "Bash(cd frontend && npm test:*)",
+      "Bash(cd frontend && npx vitest run:*)",
+      "Bash(./.claude/hooks/check-conventions.sh:*)",
+      "Bash(git status:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(git log:*)",
+      "Bash(git rev-list:*)",
+      "Bash(git show:*)",
+      "Bash(git diff:*)",
+      "Bash(git branch --list:*)",
+      "Bash(git switch:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git merge --no-ff:*)",
+      "Bash(grep:*)",
+      "Bash(date:*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/filter-test-output.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

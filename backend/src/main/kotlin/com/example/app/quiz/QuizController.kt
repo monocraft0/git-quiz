@@ -18,7 +18,9 @@ class QuizController(
     private val quizService: QuizService,
 ) {
     @GetMapping
-    fun getQuestions(@RequestParam count: Int?): List<QuizQuestionDto> = TODO("not implemented")
+    fun getQuestions(
+        @RequestParam(required = false, defaultValue = "5") count: Int,
+    ): List<QuizQuestionDto> = quizService.getQuestions(count)
 
     @PostMapping("/{id}/answer")
     fun answer(

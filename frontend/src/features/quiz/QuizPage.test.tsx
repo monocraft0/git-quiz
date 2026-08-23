@@ -1,8 +1,9 @@
 import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { QuizPage } from './QuizPage';
 import { api } from '../../api/client';
-import type { QuizQuestionDto } from './types';
+import type { QuizQuestionDto, AnswerResultDto } from './types';
 
 vi.mock('../../api/client', () => ({
   api: { get: vi.fn(), post: vi.fn() },
@@ -28,5 +29,27 @@ describe('QuizPage', () => {
     expect(screen.getByRole('button', { name: 'コミット' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'プッシュ' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'マージ' })).toBeInTheDocument();
+  });
+
+  it('選択肢をクリックすると解答を送信し、正解時は正解表示と解説が表示される', async () => {
+    const user = userEvent.setup();
+    mockedGet.mockResolvedValueOnce(questions);
+    const answerResult: AnswerResultDto = {
+      correct: true,
+      correctIndex: 0,
+      explanation: 'git add はステージングに追加します。',
+    };
+    mockedPost.mockResolvedValueOnce(answerResult);
+
+    render(<QuizPage />);
+    await waitFor(() => expect(screen.getByText('Q1: git add とは？')).toBeInTheDocument());
+
+    await user.click(screen.getByRole('button', { name: 'ステージング' }));
+
+    await waitFor(() =>
+      expect(mockedPost).toHaveBeenCalledWith('/api/quiz/questions/1/answer', { selectedIndex: 0 }),
+    );
+    await waitFor(() => expect(screen.getByText('正解')).toBeInTheDocument());
+    expect(screen.getByText('git add はステージングに追加します。')).toBeInTheDocument();
   });
 });

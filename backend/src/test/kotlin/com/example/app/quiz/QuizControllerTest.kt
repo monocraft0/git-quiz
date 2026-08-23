@@ -3,6 +3,7 @@ package com.example.app.quiz
 import com.example.app.quiz.dto.QuizQuestionDto
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
+import io.mockk.verify
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -33,5 +34,17 @@ class QuizControllerTest(
                 jsonPath("$[0].correctIndex") { doesNotExist() }
                 jsonPath("$[0].explanation") { doesNotExist() }
             }
+    }
+
+    @Test
+    fun `GET api quiz questions without count uses default count 5`() {
+        every { quizService.getQuestions(5) } returns emptyList()
+
+        mockMvc.get("/api/quiz/questions")
+            .andExpect {
+                status { isOk() }
+            }
+
+        verify(exactly = 1) { quizService.getQuestions(5) }
     }
 }

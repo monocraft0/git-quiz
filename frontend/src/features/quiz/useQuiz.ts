@@ -43,12 +43,25 @@ export function useQuiz(): QuizState {
 
   const currentQuestion = questions[currentIndex] ?? null;
 
-  const submitAnswer = (_selectedIndex: number) => {
-    // no-op stub: 次のテストで実装する
+  const submitAnswer = (selectedIndex: number) => {
+    if (!currentQuestion || result) return;
+    api
+      .post<AnswerResultDto>(`/api/quiz/questions/${currentQuestion.id}/answer`, { selectedIndex })
+      .then((res) => {
+        setResult(res);
+        setAnsweredCount((c) => c + 1);
+        if (res.correct) setScore((s) => s + 1);
+      })
+      .catch((e: unknown) => setError(e instanceof Error ? e.message : 'unknown error'));
   };
 
   const nextQuestion = () => {
-    // no-op stub: 次のテストで実装する
+    setResult(null);
+    if (currentIndex + 1 >= questions.length) {
+      setFinished(true);
+      return;
+    }
+    setCurrentIndex((i) => i + 1);
   };
 
   return {

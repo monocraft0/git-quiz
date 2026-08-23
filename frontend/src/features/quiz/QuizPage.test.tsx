@@ -92,4 +92,37 @@ describe('QuizPage', () => {
 
     await waitFor(() => expect(screen.getByText('Q2: git commit とは？')).toBeInTheDocument());
   });
+
+  it('最後の問題に回答して次へ進むと、最終スコアのサマリーが表示され質問や選択肢は表示されなくなる', async () => {
+    const user = userEvent.setup();
+    mockedGet.mockResolvedValueOnce(questions);
+    const correctResult: AnswerResultDto = {
+      correct: true,
+      correctIndex: 0,
+      explanation: 'git add はステージングに追加します。',
+    };
+    const incorrectResult: AnswerResultDto = {
+      correct: false,
+      correctIndex: 0,
+      explanation: 'git commit は変更を記録します。',
+    };
+    mockedPost.mockResolvedValueOnce(correctResult).mockResolvedValueOnce(incorrectResult);
+
+    render(<QuizPage />);
+    await waitFor(() => expect(screen.getByText('Q1: git add とは？')).toBeInTheDocument());
+
+    await user.click(screen.getByRole('button', { name: 'ステージング' }));
+    await waitFor(() => expect(screen.getByText('正解')).toBeInTheDocument());
+    await user.click(screen.getByRole('button', { name: '次の問題へ' }));
+
+    await waitFor(() => expect(screen.getByText('Q2: git commit とは？')).toBeInTheDocument());
+    await user.click(screen.getByRole('button', { name: '記録' }));
+    await waitFor(() => expect(screen.getByText('不正解')).toBeInTheDocument());
+    await user.click(screen.getByRole('button', { name: '次の問題へ' }));
+
+    await waitFor(() => expect(screen.getByText('2問中1問正解')).toBeInTheDocument());
+    expect(screen.queryByText('Q1: git add とは？')).not.toBeInTheDocument();
+    expect(screen.queryByText('Q2: git commit とは？')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: '次の問題へ' })).not.toBeInTheDocument();
+  });
 });

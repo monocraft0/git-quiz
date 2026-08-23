@@ -1,5 +1,6 @@
 package com.example.app.quiz
 
+import com.example.app.quiz.dto.AnswerResultDto
 import com.example.app.quiz.dto.QuizQuestionDto
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
@@ -7,8 +8,10 @@ import io.mockk.verify
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
+import org.springframework.test.web.servlet.post
 
 @WebMvcTest(QuizController::class)
 class QuizControllerTest(
@@ -46,5 +49,24 @@ class QuizControllerTest(
             }
 
         verify(exactly = 1) { quizService.getQuestions(5) }
+    }
+
+    @Test
+    fun `POST api quiz questions id answer with correct index returns correct true`() {
+        every { quizService.judgeAnswer(1, 0) } returns AnswerResultDto(
+            correct = true,
+            correctIndex = 0,
+            explanation = "git add はステージングに追加します。",
+        )
+
+        mockMvc.post("/api/quiz/questions/1/answer") {
+            contentType = MediaType.APPLICATION_JSON
+            content = """{"selectedIndex":0}"""
+        }.andExpect {
+            status { isOk() }
+            jsonPath("$.correct") { value(true) }
+            jsonPath("$.correctIndex") { value(0) }
+            jsonPath("$.explanation") { value("git add はステージングに追加します。") }
+        }
     }
 }

@@ -86,4 +86,18 @@ class QuizControllerTest(
             jsonPath("$.correct") { value(false) }
         }
     }
+
+    @Test
+    fun `POST api quiz questions id answer with unknown id returns 404`() {
+        every { quizService.judgeAnswer(999, 0) } throws NoSuchElementException("quiz question not found: 999")
+
+        mockMvc.post("/api/quiz/questions/999/answer") {
+            contentType = MediaType.APPLICATION_JSON
+            content = """{"selectedIndex":0}"""
+        }.andExpect {
+            status { isNotFound() }
+            jsonPath("$.code") { value("NOT_FOUND") }
+            jsonPath("$.message") { value("quiz question not found: 999") }
+        }
+    }
 }

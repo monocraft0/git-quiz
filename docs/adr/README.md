@@ -14,3 +14,4 @@ Architecture Decision Record。**なぜそう決めたか**だけを置く。
 | --- | --- | --- | --- |
 | [0001](./0001-record-architecture-decisions.md) | 設計判断をADRとして記録する | accepted | 判断の履歴を `docs/adr/` にMADR風で残し、ループの成果物として `code-reviewer` が欠落を検出する |
 | [0002](./0002-write-tests-first.md) | 実装より先にテストを書き、赤をコミットとして残す | accepted | TDDを設計原則にし、`test: … — red` コミットを証拠として `code-reviewer` が再現する。正しい赤があるテストはミューテーション試験を省く |
+| [0003](./0003-judge-quiz-answers-server-side.md) | クイズの正誤判定と正解値の受け渡しをAPI契約として分離する | accepted | 質問一覧APIは選択肢のみ返し正解を含めない。判定は別エンドポイントでサーバー側が行う |

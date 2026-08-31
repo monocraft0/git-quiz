@@ -259,3 +259,6 @@ cd frontend && npm install && npm run dev # → http://localhost:5173
 形の見本として読むのはよいが、履歴を「テスト先行の実例」として参照しないこと。
 ここから作る機能は [`.claude/skills/tdd/SKILL.md`](.claude/skills/tdd/SKILL.md) に従って
 赤から始める。
+
+
+test

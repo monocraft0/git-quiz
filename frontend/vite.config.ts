@@ -2,14 +2,13 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
+// GitHub Pages（https://<user>.github.io/git-quiz/）ではサブパスで配信されるため、
+// ワークフローが BASE_PATH=/git-quiz/ を渡す。ローカルでは / のまま。
 export default defineConfig({
+  base: process.env.BASE_PATH ?? '/',
   plugins: [react()],
   server: {
     port: 5173,
-    // /api を backend(8080) にプロキシ。フロントは相対パスで叩ける。
-    proxy: {
-      '/api': 'http://localhost:8080',
-    },
   },
   test: {
     globals: true,

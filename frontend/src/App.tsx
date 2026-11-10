@@ -1,4 +1,3 @@
-import { HealthPage } from './features/health/HealthPage';
 import { MissionPage } from './features/missions/MissionPage';
 
 export function App() {
@@ -9,10 +8,6 @@ export function App() {
         コマンドを打って、ミッションの状態を作ろう。打ったコマンドの結果は下の図ですぐに動きます。
       </p>
       <MissionPage />
-      <details style={{ marginTop: '2rem', color: 'var(--muted)' }}>
-        <summary>接続状態</summary>
-        <HealthPage />
-      </details>
     </main>
   );
 }

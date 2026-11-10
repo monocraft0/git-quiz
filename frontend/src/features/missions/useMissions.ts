@@ -1,9 +1,8 @@
-import { useCallback, useEffect, useState } from 'react';
-import { api } from '../../api/client';
-import { initialRepo, runCommand, runScript } from '../gitsim/gitSimulator';
+import { useState } from 'react';
+import { runCommand, runScript } from '../gitsim/gitSimulator';
 import type { RepoState } from '../gitsim/types';
-import { toSnapshot } from './snapshot';
-import type { JudgeResultDto, MissionDto } from './types';
+import { judgeMission } from './judge';
+import type { JudgeResult, Mission } from './types';
 
 export interface TerminalLine {
   kind: 'input' | 'output' | 'error';
@@ -11,63 +10,38 @@ export interface TerminalLine {
 }
 
 export interface MissionsState {
-  loading: boolean;
-  error: string | null;
-  mission: MissionDto | null;
+  mission: Mission | null;
   missionIndex: number;
   total: number;
   repo: RepoState;
   history: TerminalLine[];
-  result: JudgeResultDto | null;
+  result: JudgeResult | null;
   clearedCount: number;
   finished: boolean;
   run: (command: string) => void;
   judge: () => void;
   reset: () => void;
   next: () => void;
+  restart: () => void;
 }
 
-// ミッションの取得・シミュレータの状態・判定APIの呼び出しをまとめて持つ。
-// gitの挙動はブラウザ内で完結させ、判定だけサーバーに問い合わせる（docs/adr/0004）。
-export function useMissions(): MissionsState {
-  const [missions, setMissions] = useState<MissionDto[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+// 出題の進行・シミュレータの状態・判定をまとめて持つ。すべてブラウザ内で完結する（docs/adr/0005）。
+export function useMissions(missions: Mission[]): MissionsState {
   const [missionIndex, setMissionIndex] = useState(0);
-  const [repo, setRepo] = useState<RepoState>(initialRepo);
+  const [repo, setRepo] = useState<RepoState>(() => runScript(missions[0]?.setupCommands ?? []));
   const [history, setHistory] = useState<TerminalLine[]>([]);
-  const [result, setResult] = useState<JudgeResultDto | null>(null);
+  const [result, setResult] = useState<JudgeResult | null>(null);
   const [clearedIds, setClearedIds] = useState<Set<number>>(new Set());
   const [finished, setFinished] = useState(false);
 
   const mission = missions[missionIndex] ?? null;
 
-  const startMission = useCallback((m: MissionDto | undefined) => {
+  const start = (index: number) => {
+    setMissionIndex(index);
+    setRepo(runScript(missions[index]?.setupCommands ?? []));
     setHistory([]);
     setResult(null);
-    if (!m) return;
-    try {
-      setRepo(runScript(m.setupCommands));
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'unknown error');
-    }
-  }, []);
-
-  useEffect(() => {
-    let alive = true;
-    api
-      .get<MissionDto[]>('/api/missions')
-      .then((res) => {
-        if (!alive) return;
-        setMissions(res);
-        startMission(res[0]);
-      })
-      .catch((e: unknown) => alive && setError(e instanceof Error ? e.message : 'unknown error'))
-      .finally(() => alive && setLoading(false));
-    return () => {
-      alive = false;
-    };
-  }, [startMission]);
+  };
 
   const run = (command: string) => {
     if (command.trim() === 'clear') {
@@ -85,29 +59,26 @@ export function useMissions(): MissionsState {
 
   const judge = () => {
     if (!mission) return;
-    api
-      .post<JudgeResultDto>(`/api/missions/${mission.id}/judge`, toSnapshot(repo))
-      .then((res) => {
-        setResult(res);
-        if (res.cleared) setClearedIds((ids) => new Set(ids).add(mission.id));
-      })
-      .catch((e: unknown) => setError(e instanceof Error ? e.message : 'unknown error'));
+    const r = judgeMission(mission.goals, repo);
+    setResult(r);
+    if (r.cleared) setClearedIds((ids) => new Set(ids).add(mission.id));
   };
-
-  const reset = () => startMission(mission ?? undefined);
 
   const next = () => {
     if (missionIndex + 1 >= missions.length) {
       setFinished(true);
       return;
     }
-    setMissionIndex(missionIndex + 1);
-    startMission(missions[missionIndex + 1]);
+    start(missionIndex + 1);
+  };
+
+  const restart = () => {
+    setClearedIds(new Set());
+    setFinished(false);
+    start(0);
   };
 
   return {
-    loading,
-    error,
     mission,
     missionIndex,
     total: missions.length,
@@ -118,7 +89,8 @@ export function useMissions(): MissionsState {
     finished,
     run,
     judge,
-    reset,
+    reset: () => start(missionIndex),
     next,
+    restart,
   };
 }

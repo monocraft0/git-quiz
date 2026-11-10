@@ -137,6 +137,7 @@ describe('MissionPage', () => {
     await user.click(screen.getByRole('button', { name: '答え合わせ' }));
     await user.click(screen.getByRole('button', { name: '答え合わせ' }));
     await user.click(screen.getByRole('button', { name: '次のミッションへ' }));
+    await user.click(screen.getByRole('button', { name: '答え合わせ' }));
     await user.click(screen.getByRole('button', { name: '次のミッションへ' }));
 
     expect(screen.getByText('2問中1問クリア')).toBeInTheDocument();

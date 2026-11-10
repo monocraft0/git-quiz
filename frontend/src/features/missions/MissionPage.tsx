@@ -3,12 +3,12 @@ import { AreasPanel } from '../gitsim/AreasPanel';
 import { GitGraph } from '../gitsim/GitGraph';
 import { Terminal } from '../gitsim/Terminal';
 import '../gitsim/gitsim.css';
+import { MISSIONS } from './missions';
+import type { Mission } from './types';
 import { useMissions } from './useMissions';
 
-export function MissionPage() {
+export function MissionPage({ missions = MISSIONS }: { missions?: Mission[] }) {
   const {
-    loading,
-    error,
     mission,
     missionIndex,
     total,
@@ -21,13 +21,12 @@ export function MissionPage() {
     judge,
     reset,
     next,
-  } = useMissions();
+    restart,
+  } = useMissions(missions);
   const [showAnswer, setShowAnswer] = useState(false);
 
   useEffect(() => setShowAnswer(false), [mission?.id, result]);
 
-  if (loading) return <p role="status">読み込み中…</p>;
-  if (error) return <p role="alert">error: {error}</p>;
   if (finished) {
     return (
       <section className="mission-summary">
@@ -35,7 +34,7 @@ export function MissionPage() {
         <p className="summary-score">
           {total}問中{clearedCount}問クリア
         </p>
-        <button type="button" onClick={() => window.location.reload()}>
+        <button type="button" onClick={restart}>
           最初から挑戦する
         </button>
       </section>
@@ -60,14 +59,14 @@ export function MissionPage() {
             const state = !r ? 'pending' : r.passed ? 'passed' : 'failed';
             return (
               <li
-                key={goal}
+                key={goal.description}
                 className={`goal goal-${state}`}
-                aria-label={r ? `${r.passed ? '達成' : '未達成'}: ${goal}` : undefined}
+                aria-label={r ? `${r.passed ? '達成' : '未達成'}: ${goal.description}` : undefined}
               >
                 <span className="goal-mark" aria-hidden="true">
                   {mark}
                 </span>
-                {goal}
+                {goal.description}
               </li>
             );
           })}
@@ -95,10 +94,10 @@ export function MissionPage() {
           <p className="result-title">{result.cleared ? 'クリア！' : 'まだクリアしていません'}</p>
           {(result.cleared || showAnswer) && (
             <>
-              <p>{result.explanation}</p>
+              <p>{mission.explanation}</p>
               <p className="answer-label">模範解答の一例:</p>
               <pre className="answer">
-                {result.modelAnswer.map((line) => (
+                {mission.modelAnswer.map((line) => (
                   <code key={line}>{line}</code>
                 ))}
               </pre>

@@ -17,11 +17,11 @@ class MissionController(
     private val missionService: MissionService,
 ) {
     @GetMapping
-    fun getMissions(): List<MissionDto> = TODO("not implemented")
+    fun getMissions(): List<MissionDto> = missionService.getMissions()
 
     @PostMapping("/{id}/judge")
     fun judge(
         @PathVariable id: Long,
         @Valid @RequestBody snapshot: RepoSnapshotDto,
-    ): JudgeResultDto = TODO("not implemented")
+    ): JudgeResultDto = missionService.judge(id, snapshot)
 }

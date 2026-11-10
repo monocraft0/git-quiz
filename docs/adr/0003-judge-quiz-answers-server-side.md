@@ -1,7 +1,8 @@
 ---
 id: "0003"
 title: クイズの正誤判定と正解値の受け渡しをAPI契約として分離する
-status: accepted
+status: superseded
+superseded-by: "0004"
 date: 2026-08-23
 tags: [backend, api]
 ---

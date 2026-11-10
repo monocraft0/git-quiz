@@ -1,9 +1,9 @@
 import { fileStatus, reachableFrom } from '../gitsim/gitSimulator';
 import type { RepoState } from '../gitsim/types';
-import type { RepoSnapshotDto } from './types';
+import type { RepoSnapshot } from './types';
 
-// シミュレータの状態を判定APIに送る形へ変換する
-export function toSnapshot(state: RepoState): RepoSnapshotDto {
+// シミュレータの状態を判定に使う要約へ変換する
+export function toSnapshot(state: RepoState): RepoSnapshot {
   return {
     head: state.head.type === 'branch' ? state.head.name : null,
     branches: state.branchOrder

@@ -192,8 +192,8 @@ base 上で backlog.md から削除 → done.md に追記 → コミット
 4. 緑を保ったままリファクタする
 5. リストが尽きるまで2へ戻る
 
-**コンパイルエラーは赤に数えない。** シグネチャだけ先に置き（Kotlin は `TODO()`、
-TS は `throw new Error('not implemented')`）、**assertion が落ちる形**で赤にする。
+**コンパイルエラーは赤に数えない。** シグネチャだけ先に置き
+（`throw new Error('not implemented')`）、**assertion が落ちる形**で赤にする。
 存在しないクラスを呼んで落ちただけでは、そのテストが何を守るか分かっていない。
 
 回し方の詳細・スタック別の書き方・TDDを適用しない対象は `.claude/skills/tdd/SKILL.md`。
@@ -231,7 +231,7 @@ feat: <対象> — green                      ← 実装
 
 1. そのテストが守っているはずの実装を、**1箇所だけ**意図的に壊す
    （値を canary 文字列にする／条件を反転する／ハンドラを消す／フィールドを足す）
-2. `./gradlew test --rerun-tasks` を実行し、**どのテストが落ちたか**を記録する
+2. 対象のテストを `npx vitest run <ファイル>` で実行し、**どのテストが落ちたか**を記録する
 3. 壊した箇所を元に戻し、`git diff` に残骸が無いことと、緑に戻ることを確認する
 4. **落ちたテスト名を報告に書く**。落ちなかった場合は、赤くなるまでテストを強化してから返す
 
@@ -259,9 +259,7 @@ verifier に回さない**。
 
 | 落とし穴 | 症状 | 対処 |
 | --- | --- | --- |
-| Gradle の UP-TO-DATE | `make test` が緑でも、実際にはテストを実行していない | 判断に使うときは `./gradlew test --rerun-tasks` |
-| `make backend` の短絡 | health が応答する限り再起動せず、**古いコードのまま**動き続ける | `make restart`、または `make stop && make backend` |
-| `make test` は DB を起動しない | `ddl-auto: validate` のカラムのズレを**どちらのゲートも検出できない** | スキーマを触る周は実機起動まで人／オーケストレータが確認する |
+| 見た目・アニメーション | `make test` / `make build` はどちらも画面の見た目を検出できない | 画面を触る周は `make start` で実機でも確認する |
 | Bash の作業ディレクトリ | 前の `cd` が残り、別ディレクトリで `make` が走る | 常に絶対パスで実行する |
 | コンパイルエラーを赤と読む | テストが「落ちた」が、実装を経由した証明にはなっていない | シグネチャを先に置き、assertion で落とす |
 | 赤コミットを畳む | `--amend` / squash で順序の証拠が消え、verifier が再現できない | 赤コミットは残したまま merge する |
@@ -275,7 +273,6 @@ verifier に回さない**。
 | --- | --- | --- | --- |
 | 分解・依存の判断・統合・差し戻しの原因特定 | `/work-next` 本体 | **opus** | 1周の質はここで決まる。ここをケチると下流が全部やり直しになる |
 | テストリストの作成（何を確かめるか） | `/work-next` 本体 | **opus** | 何を確かめるかは仕様の決定。実装側に決めさせると、実装しやすいものだけがテストになる |
-| バックエンド実装（赤→緑→リファクタ） | `backend-dev` | sonnet | 規約と SKILL.md が形を決めている。埋める作業 |
 | フロントエンド実装（赤→緑→リファクタ） | `frontend-dev` | sonnet | 同上 |
 | 機械的な作業（TODO削除・リネーム・定型テスト・1ファイルの小修正） | 同じ実装エージェント | haiku | 判断が要らない。呼び出し側が `model: haiku` で起動する |
 | 設計判断の記録（ADR） | `/work-next` 本体 | **opus** | 判断そのもの。実装エージェントに書かせたら、判断を委譲したのと同じ |
@@ -360,8 +357,6 @@ git reset --hard   git clean   git branch -D
 ループは無人で回りうる。次は**どの周でも**やらない。
 
 - `git push` / PR作成 — 外向きの操作は人の判断を待つ
-- 既存の Flyway `V__` ファイルの編集 — 新しいバージョンを足す
-- `docker compose down -v` — Postgresコンテナは他アプリと共有（CLAUDE.md 設計原則8）
 - `backlog.md` に無い作業への横道 — 気づいたことは backlog に**足すだけ**にして、その周では着手しない
 - **実装を書いてからテストを後付けする** — 赤を見ていないテストは「書いた」に含めない
   （「赤を先に見る（TDD）」。対象外の判断基準は `.claude/skills/tdd/SKILL.md`）
@@ -441,7 +436,6 @@ git reset --hard   git clean   git branch -D
 
 ```markdown
 - [ ] <タスク名（1行で何を作るか）>
-      db: postgres | dynamo | none
       model: haiku | sonnet | opus      <実装に使うモデル。省略時 sonnet>
       review: sonnet | opus             <verifier に使うモデル。省略時 opus>
       adr: required | none              <設計判断を含むと人が判断した場合。省略時はループが判定>

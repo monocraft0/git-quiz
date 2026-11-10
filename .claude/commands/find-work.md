@@ -21,7 +21,7 @@ allowed-tools: Read, Edit, Bash, Grep, Glob
    `make test` は最初の失敗で止まるので、**個別に走らせて両方の結果を得る**。
 
    ```bash
-   cd backend && ./gradlew test --continue; cd ../frontend && npm test
+   cd frontend && npm test
    ```
 
    - 失敗した**テスト単位**でタスク化する。
@@ -35,7 +35,7 @@ allowed-tools: Read, Edit, Bash, Grep, Glob
 3. **TODO / FIXME を走査**（`--test` 単独指定時は飛ばす）
 
    ```bash
-   grep -rn -E 'TODO|FIXME' backend/src frontend/src
+   grep -rn -E 'TODO|FIXME' frontend/src
    ```
 
    - 1件 = 1タスク。本文が具体的でなければ、周辺コードを読んで

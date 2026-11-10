@@ -36,7 +36,7 @@ runner="$hook_dir/run-gate.sh"
 # 赤→緑で何度も走るので、成功時の出力を捨てる効果がいちばん大きいのはこの形。
 # 引数の文字クラスは狭く固定しているので、`|` `` ` `` `$(` `>` は構造上通らない。
 q="'"
-allowed="^(cd [A-Za-z0-9_./-]+|make (test|build|gate|test-backend|test-frontend)|\./gradlew (test|build|check)( --continue)?( --rerun-tasks)?( --tests ${q}[A-Za-z0-9_.*-]+${q})?|npm (test|run build)|npx vitest run( [A-Za-z0-9_./-]+)?)\$"
+allowed="^(cd [A-Za-z0-9_./-]+|make (test|build|gate|test-frontend)|npm (test|run build)|npx vitest run( [A-Za-z0-9_./-]+)?)\$"
 
 # `&&` と `;` で分割する。sed の `\n` は環境差があるので bash の置換で行う。
 segs="${cmd//&&/$'\n'}"

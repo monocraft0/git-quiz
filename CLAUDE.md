@@ -1,53 +1,45 @@
 # CLAUDE.md
 
-このリポジトリは **フルスタックWebアプリのモノレポ・テンプレート** です。
-このファイルに書かれた規約は、ここで作られるすべてのアプリに共通で適用されます。
+このリポジトリは **gitの操作を学ぶ、フロントエンドだけで動くクイズアプリ** です
+（BE/DBは持たない。経緯は `docs/adr/0005`）。
+このファイルに書かれた規約は、ここで作られる機能に共通で適用されます。
 
 ## スタック
 
 | レイヤ | 技術 |
 | --- | --- |
 | Frontend | TypeScript / React / Vite / Vitest / React Testing Library |
-| Backend | Kotlin / Spring Boot / Gradle (Kotlin DSL) / JUnit5 |
-| RDB | PostgreSQL（マイグレーションは **Flyway**） |
-| KVS | DynamoDB（ローカルは **DynamoDB Local**、AWS SDK v2 Enhanced Client） |
-| ローカル基盤 | Docker Compose（postgres / dynamodb-local / dynamodb-admin） |
+| 配信 | GitHub Pages（`.github/workflows/pages.yml`。main への push でデプロイ） |
 
 ## ディレクトリ構成
 
 ```
 .
 ├── frontend/          React + Vite + TS
-│   └── src/
-│       ├── api/       APIクライアント（fetchラッパ）
-│       └── features/  機能ごとにコンポーネント/フック/型/テストを同居
-├── backend/           Spring Boot + Kotlin
-│   └── src/main/kotlin/com/example/app/
-│       ├── <feature>/ 機能ごとに controller/service/repository/dto を同居
-│       └── config/    横断設定（DynamoDB, CORS など）
-│   └── src/main/resources/db/migration/  Flyway SQL (V__)
-├── infra/             docker-compose.yml と初期化スクリプト
+│   └── src/features/
+│       ├── gitsim/    gitの挙動を再現するシミュレータ + 図（3エリア・コミットグラフ・ターミナル）
+│       └── missions/  ミッション定義・判定・出題画面
 ├── docs/              図・補足資料（loop-flow.drawio = ループ1周の流れ）
 │   └── adr/           設計判断の記録（ADR）。なぜそう決めたかを1判断1ファイルで残す
 ├── Makefile           ローカル起動タスク（make start が唯一の入口）
+├── .github/workflows/ GitHub Pages へのデプロイ
 ├── .claude/           ハーネス（commands / agents / skills）
 └── .loop/             ループの永続状態（backlog / done / LOOP.md）
 ```
 
-## 設計原則（全アプリ共通）
+## 設計原則
 
 1. **機能単位でまとめる（package-by-feature）**。レイヤ横断のフォルダより機能フォルダを優先。
-2. **層の責務を守る**: Controller=I/Oと検証 / Service=ビジネスロジック / Repository=永続化。Controllerにロジックを書かない。
-3. **DTOとEntityを分ける**。APIの入出力にEntityを直接晒さない。
-4. **フロントとバックの型を一致させる**。エンドポイント変更時は `frontend/src/**` の対応する型も更新する。
-5. **秘密情報はコミットしない**。`.env` は `.env.example` を複製して使う。
-6. **テストを先に書く（TDD）**。実装コードより先に落ちるテストを書き、**赤を実際に見てから**
-   実装する。FE=Vitest、BE=JUnit5。サイクルと「何が正しい赤か」は
-   `.claude/skills/tdd/SKILL.md`。対象外（設定・配線・見た目・リファクタ）もそこに定義がある。
-7. **ローカル起動は Makefile に集約する**。起動手順を README や口頭に散らさず `make` ターゲットにする。
-8. **他アプリを壊さない**。Postgresコンテナは全アプリ共有、**データベースだけアプリごと**に分ける。
-   `POSTGRES_DB` はアプリ固有の名前にし、`docker compose down -v` は使わない。
-9. **設計判断は ADR に残す**。後戻りが高い選択（依存の追加、永続化先、API契約の方針、
+2. **gitの挙動は純粋関数で持つ**。`gitsim/gitSimulator.ts` は state を書き換えず新しい state を返す。
+   UIはその結果を描くだけで、gitのルールをコンポーネントに書かない。
+3. **判定はコマンド列ではなく結果の状態で行う**。別解でも正解になる。
+   ミッションの目標にコミットIDを書かない（初期化コマンドで変わる）。
+4. **秘密情報はコミットしない**。このアプリに秘密情報は無いが、`.env` は追跡しない。
+5. **テストを先に書く（TDD）**。実装コードより先に落ちるテストを書き、**赤を実際に見てから**
+   実装する。Vitest。サイクルと「何が正しい赤か」は `.claude/skills/tdd/SKILL.md`。
+   対象外（設定・配線・見た目・リファクタ）もそこに定義がある。
+6. **ローカル起動は Makefile に集約する**。起動手順を README や口頭に散らさず `make` ターゲットにする。
+7. **設計判断は ADR に残す**。後戻りが高い選択（依存の追加、配信方法、
    この原則からの逸脱）は `docs/adr/` に**なぜそう決めたか**を書く。索引は
    `docs/adr/README.md`、起票の基準は `.claude/skills/adr/SKILL.md`。
 
@@ -75,36 +67,23 @@
 ## よく使うコマンド
 
 ```bash
-# FE/BE/DB をまとめて起動（推奨。個別に立てる必要があるときだけ下のコマンドを使う）
-make start
+make start      # 開発サーバー起動 http://localhost:5173
 make stop
 make status
+make test       # Vitest（赤→緑の内側ループもこれ）
+make build      # 型チェック込みビルド
+make gate       # test + build（完了判定）
 
-# ローカル基盤（Postgres / DynamoDB Local）起動
-docker compose -f infra/docker-compose.yml up -d
-
-# frontend
-cd frontend && npm install && npm run dev      # http://localhost:5173
-cd frontend && npm test                         # Vitest
-
-# backend
-cd backend && ./gradlew bootRun                  # http://localhost:8080
-cd backend && ./gradlew test
-
-# 赤→緑を回すときの内側ループ（片側だけ走らせる）
-make test-backend
-make test-frontend
+cd frontend && npm run dev
+cd frontend && npx vitest run src/features/gitsim   # 片側だけ走らせる
 ```
 
 ## ハーネスの使い方
 
 新しい機能やアプリを作るときは `.claude/` のコマンド／スキルを起点にする。
 
-- `/setup-local` — `make start` でDB/backend/frontendを起動して疎通確認
-- `/scaffold-feature <name>` — フロント〜バックを縦断する機能を一括生成
-- `/new-endpoint <name>` — バックエンドのエンドポイント追加
+- `/setup-local` — `make start` で開発サーバーを起動して疎通確認
 - `/new-component <name>` — フロントエンドのコンポーネント追加
-- `/new-migration <name>` — Flywayマイグレーション追加
 - `/adr <題名>` — 設計判断をADRとして `docs/adr/` に起票
 
 詳細は `.claude/skills/` 配下の各SKILL.mdを参照。
@@ -141,8 +120,7 @@ make test-frontend
 Blocker として扱う。基準は `.claude/skills/adr/SKILL.md`。
 
 **モデルは役割で分ける**。分解・判断・統合と合否判定は opus、実装は sonnet
-（機械的なタスクは haiku）。`/work-next` 本体は実装を書かず、`backend-dev` /
-`frontend-dev` に委譲する。配分表と理由は `.loop/LOOP.md`「モデル配分」。
+（機械的なタスクは haiku）。`/work-next` 本体は実装を書かず、`frontend-dev` に委譲する。配分表と理由は `.loop/LOOP.md`「モデル配分」。
 
 規約の全文は `.loop/LOOP.md` を参照。
 

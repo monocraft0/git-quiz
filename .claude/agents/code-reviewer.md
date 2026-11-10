@@ -1,6 +1,6 @@
 ---
 name: code-reviewer
-description: Use to review changes in this fullstack repo against the project conventions before finalizing a feature. Checks layering, DTO/Entity separation, type sync between frontend and backend, migrations, test coverage, and whether design decisions are recorded as ADRs under docs/adr/. Returns a PASS/FAIL verdict so it can gate the loop (see .loop/LOOP.md). Read-only.
+description: Use to review changes in this frontend-only repo against the project conventions before finalizing a feature. Checks the gitsim/missions separation, test coverage, and whether design decisions are recorded as ADRs under docs/adr/. Returns a PASS/FAIL verdict so it can gate the loop (see .loop/LOOP.md). Read-only.
 tools: Read, Bash, Grep, Glob
 model: opus
 ---
@@ -46,8 +46,7 @@ git log --oneline --stat <base>..HEAD          # test-only コミットが実装
 ```bash
 cd "$WORK"
 git switch --detach <赤コミット>   # checkout は許可リストに無い
-./gradlew test --rerun-tasks --tests '*<テストクラス>*'   # backend
-npx vitest run <テストファイル>                           # frontend
+npx vitest run <テストファイル>
 ```
 
 見るのは**落ちたか**ではなく**なぜ落ちたか**。
@@ -150,17 +149,11 @@ untracked のファイルがある場合は `cp` で複製側へ持ち込む（�
 > ここだけは**迷ったら Blocker に倒さない**。命名・整形・規約どおりの実装まで
 > ADRを要求すると、差し戻し上限3回を無駄に溶かす。判断が実在したときだけ指摘する。
 
-**バックエンド**
-- Controllerにビジネスロジックが漏れていないか（薄いか）
-- DTOとEntityが分離され、Entityがレスポンスに晒されていないか
-- 入力DTOに検証アノテーションがあるか
-- スキーマ変更がFlywayマイグレーションで行われ、**既存のVファイルが編集されていない**か
-- `ddl-auto` が `validate` のままか
-
 **フロントエンド**
-- APIアクセスが `src/api/client.ts` 経由に統一されているか
-- 取得ロジックがフックに隔離され、loading/error/data の3状態を扱っているか
-- 型がバックのDTOと一致しているか（**FEとBEの型ズレ**を重点確認）
+- gitの挙動が `gitsim/gitSimulator.ts` の純粋関数に閉じ、コンポーネントにルールが漏れていないか
+- ミッションの目標にコミットIDが書かれていないか（判定は結果の状態で行う）
+- 状態を持つ処理がフックに隔離されているか
+- 外部へ `fetch` していないか（BE を持たない。docs/adr/0005）
 
 ## 報告フォーマット
 

@@ -1,16 +1,13 @@
 # env / secrets
 .env
+.env.*
+!.env.example
 
 # frontend
 frontend/node_modules/
 frontend/dist/
 frontend/coverage/
 frontend/*.tsbuildinfo
-
-# backend
-backend/.gradle/
-backend/build/
-backend/bin/
 
 # Claude Code の個人設定（許可リストは .claude/settings.json に置き、共有する）
 .claude/settings.local.json

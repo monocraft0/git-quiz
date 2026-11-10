@@ -16,3 +16,4 @@ Architecture Decision Record。**なぜそう決めたか**だけを置く。
 | [0002](./0002-write-tests-first.md) | 実装より先にテストを書き、赤をコミットとして残す | accepted | TDDを設計原則にし、`test: … — red` コミットを証拠として `code-reviewer` が再現する。正しい赤があるテストはミューテーション試験を省く |
 | [0003](./0003-judge-quiz-answers-server-side.md) | クイズの正誤判定と正解値の受け渡しをAPI契約として分離する | superseded | 質問一覧APIは選択肢のみ返し正解を含めない。判定は別エンドポイントでサーバー側が行う |
 | [0004](./0004-git-missions-with-client-simulator.md) | クイズをコマンド入力のミッション形式にし、gitの挙動はフロントのシミュレータで再現する | accepted | gitの挙動はフロントのTSシミュレータで再現し図を即時に動かす。判定はリポジトリ状態のスナップショットをサーバーが目標条件と照合する。4択は廃止 |
+| [0005](./0005-frontend-only-static-hosting.md) | BE/DBを廃止し、フロントエンドだけで動く静的サイトとしてGitHub Pagesで配信する | accepted | ミッション定義と判定をフロントに同梱しBE/DB/infraを削除。答えがJSに含まれることを受け入れる |

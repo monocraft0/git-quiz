@@ -3,13 +3,11 @@
   "permissions": {
     "allow": [
       "Bash(make test)",
-      "Bash(make test-backend)",
       "Bash(make test-frontend)",
       "Bash(make gate)",
       "Bash(make build)",
       "Bash(make status)",
       "Bash(make start)",
-      "Bash(cd backend && ./gradlew test:*)",
       "Bash(cd frontend && npm test:*)",
       "Bash(cd frontend && npx vitest run:*)",
       "Bash(./.claude/hooks/check-conventions.sh:*)",

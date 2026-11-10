@@ -1,6 +1,6 @@
 ---
 name: tdd
-description: How this repo writes code test-first — the Red → Green → Refactor cycle, what counts as a valid red (a compiling test that fails on an assertion, not a compile error), how the red is left as evidence in a test-only commit, when TDD does not apply, and when mutation self-verification is still required on top. Use whenever implementing or reviewing a change to backend or frontend code.
+description: How this repo writes code test-first — the Red → Green → Refactor cycle, what counts as a valid red (a compiling test that fails on an assertion, not a compile error), how the red is left as evidence in a test-only commit, when TDD does not apply, and when mutation self-verification is still required on top. Use whenever implementing or reviewing a change to frontend code.
 ---
 
 # TDD（赤を先に見る）
@@ -53,11 +53,6 @@ description: How this repo writes code test-first — the Red → Green → Refa
 **コンパイルが通ったうえで assertion が落ちること**。
 
 そのために、**シグネチャだけ先に置く**。中身は未実装のまま赤にする。
-
-```kotlin
-// backend: 中身は TODO() のまま。呼べるが答えは返さない
-fun summarize(id: Long): SummaryResponse = TODO("not implemented")
-```
 
 ```ts
 // frontend: 型は確定させ、実体は未実装
@@ -127,8 +122,7 @@ git add -A && git commit -m "feat: <対象> — green"
 
 | 対象外 | なぜ |
 | --- | --- |
-| 設定・配線（`application.yml` / `docker-compose.yml` / Makefile / `.claude/` / ドキュメント） | 振る舞いの単体テストが存在しない。確認は起動と出力ゲート |
-| Flyway マイグレーションの適用そのもの | `make test` はDBを起動しない。実機起動でしか出ない（`.loop/LOOP.md`） |
+| 設定・配線（`vite.config.ts` / Makefile / `.github/` / `.claude/` / ドキュメント） | 振る舞いの単体テストが存在しない。確認は起動と出力ゲート |
 | 見た目・レイアウトだけの変更 | テストで固定すると壊れやすいだけで何も守らない。出力ゲートで見る |
 | 振る舞いを変えないリファクタ | 新しい赤は要らない。**既存の緑を保つことが条件**。テストを一緒に書き換えたら、それはリファクタではない |
 

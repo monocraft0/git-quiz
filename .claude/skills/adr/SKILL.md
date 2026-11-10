@@ -28,7 +28,7 @@ ADRに書くことを他所に書かない。他所に書くことをADRに書�
 **後戻りのコストが高い**か、**選択肢が複数あった**もの。
 
 - 依存の追加・削除（ライブラリ / コンテナ / 外部サービス）
-- 永続化先の選択（postgres か dynamo か）、キー設計・正規化方針・ID体系
+- 永続化・配信方法の選択（localStorage / 外部サービス / ホスティング先）、ID体系
 - API契約の方針（エラー表現、ページング、認証方式）
 - ルート `CLAUDE.md` の設計原則からの**意図的な逸脱**、または原則そのものの変更
 - ハーネス／ループ自体の**規約**変更（`.loop/LOOP.md` / `.claude/agents/` / `.claude/skills/`）。
@@ -56,7 +56,7 @@ frontmatter + 4つの節（文脈 / 決定 / 結果 / 検討した代替案）�
 | `title` | 日本語1行。「〜する」で終える |
 | `status` | `proposed` \| `accepted` \| `superseded` |
 | `date` | `date +%F` で取る |
-| `tags` | `backend` / `frontend` / `db` / `infra` / `harness` から該当するもの |
+| `tags` | `frontend` / `infra` / `harness` から該当するもの |
 | `branch` | `loop/<slug>`。ループが起票した場合のみ。人が書いた場合は省略 |
 | `superseded-by` | 覆されたときだけ足す。覆した側の `id` |
 

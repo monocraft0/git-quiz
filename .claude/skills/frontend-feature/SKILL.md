@@ -14,15 +14,15 @@ features/foo/
 ├── FooPage.tsx        # 画面（ルーティングの単位）
 ├── FooList.tsx        # 表示コンポーネント
 ├── useFoo.ts          # データ取得フック（APIクライアント利用）
-├── types.ts           # バックのDTOに対応する型
+├── types.ts           # この機能の型
 └── FooPage.test.tsx   # Vitest + RTL
 ```
 
 ## 規約
 
-1. **型はバックのDTOに一致させる**。`types.ts` にResponse/Requestを定義し、エンドポイント変更時に必ず同期。
-2. **APIアクセスは `src/api/client.ts` 経由**。`fetch` を各所で直書きしない。ベースURLは `import.meta.env.VITE_API_BASE_URL`。
-3. **データ取得はフックに隔離**（`useFoo.ts`）。コンポーネントは表示に集中。loading / error / data の3状態を必ず扱う。
+1. **型は `types.ts` に集める**。データ定義と判定のロジックはコンポーネントの外（純粋関数）に置く。
+2. **BE は無い**。`fetch` で外部へ出ない（docs/adr/0005）。
+3. **状態を持つ処理はフックに隔離**（`useFoo.ts`）。コンポーネントは表示に集中。
 4. **コンポーネントは関数コンポーネント + Hooks**。props型を明示。
 5. **表示とロジックを分離**: 取得ロジックはフック、整形は純関数、JSXは薄く。
 6. **テストが先**: ユーザー視点でRTL（`getByRole`/`getByText`）。APIはモック（`vi.mock` or MSW）。

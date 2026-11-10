@@ -23,64 +23,33 @@ echo "== 対象 (base=$BASE) =="
 printf '  %s\n' $changed
 echo
 
-# 1. 既存の Flyway マイグレーションを編集していないか
-edited_v=$(git diff --name-only "$BASE"...HEAD -- '*/db/migration/V*.sql' 2>/dev/null; \
-           git diff --name-only -- '*/db/migration/V*.sql')
-new_v=$(git ls-files --others --exclude-standard -- '*/db/migration/V*.sql')
-edited_existing=$(comm -23 <(echo "$edited_v" | sort -u | sed '/^$/d') \
-                           <(echo "$new_v"    | sort -u | sed '/^$/d'))
-if [ -n "$edited_existing" ]; then
-  ng "既存の Flyway マイグレーションが編集されています（新しい V を足すこと）"
-  note "$edited_existing"
-else
-  ok "既存の Flyway マイグレーションは無編集"
-fi
-
-# 2. ddl-auto が validate のままか
-if grep -rq "ddl-auto:[[:space:]]*validate" backend/src/main/resources/ 2>/dev/null; then
-  ok "ddl-auto: validate を維持"
-else
-  ng "ddl-auto が validate ではありません"
-fi
-
-# 3. .env をコミットしていないか
+# 1. .env をコミットしていないか
 if git ls-files --error-unmatch .env >/dev/null 2>&1; then
   ng ".env が追跡されています"
 else
   ok ".env は未追跡"
 fi
 
-# 4. 入力DTOの検証アノテーションに @field: が付いているか
-#    Kotlin では @field: を落とすとコンストラクタ引数に付き、Bean Validation が効かない
-for f in $(echo "$changed" | grep -E 'backend/.*/dto/.*Request\.kt$' || true); do
-  [ -f "$f" ] || continue
-  if grep -qE '^\s*@(NotNull|NotBlank|Size|Min|Max|Positive|Email|Pattern)\b' "$f"; then
-    ng "$f: 検証アノテーションに @field: が付いていません"
-  else
-    ok "$f: 検証アノテーションの付け方"
-  fi
-done
-
-# 5. フロントが fetch を直書きしていないか（api/client.ts 以外）
-for f in $(echo "$changed" | grep -E '^frontend/src/' | grep -v 'api/client.ts' || true); do
+# 2. フロントが外部へ fetch していないか（BE を持たない静的サイトのため。docs/adr/0005）
+for f in $(echo "$changed" | grep -E '^frontend/src/' || true); do
   [ -f "$f" ] || continue
   if grep -qE '(^|[^.[:alnum:]])fetch\(' "$f"; then
-    ng "$f: fetch を直書きしています（src/api/client.ts 経由にする）"
+    ng "$f: fetch を使っています（このアプリは BE を持たない）"
   fi
 done
 
-# 6. package.json に依存が増えていないか（増えていたら人の確認が要る）
+# 3. package.json に依存が増えていないか（増えていたら人の確認が要る）
 if git diff "$BASE"...HEAD -- frontend/package.json 2>/dev/null | grep -qE '^\+\s*"' \
    || git diff -- frontend/package.json | grep -qE '^\+\s*"'; then
   note "! frontend/package.json に差分があります（依存の追加は意図したものか確認）"
 fi
 
-# 7. TDD: 赤いテストが実装より先にコミットされているか
+# 4. TDD: 赤いテストが実装より先にコミットされているか
 #    順序は自己申告では検証できない。ここでは「test: の赤コミットが最初の実装コミットより
 #    前にあるか」だけを機械的に見る。赤が本物か（assertion で落ちたか）は code-reviewer が
 #    複製の上でチェックアウトして再現する。規約は .claude/skills/tdd/SKILL.md。
-src_re='^(backend/src/|frontend/src/)'
-test_re='(/src/test/|\.test\.tsx?$|\.spec\.tsx?$)'
+src_re='^frontend/src/'
+test_re='(\.test\.tsx?$|\.spec\.tsx?$)'
 branch_tests=$(echo "$changed" | grep -E "$test_re" || true)
 branch_prod=$(echo "$changed" | grep -E "$src_re" | grep -vE "$test_re" || true)
 commits=$(git rev-list --reverse "$BASE"..HEAD 2>/dev/null || true)

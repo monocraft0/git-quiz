@@ -34,7 +34,7 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Task
 
 4. **分解** — ここは**自分でやる**。ループで一番難しいのはこの手順。
 
-   - タスクをスライスに割る。縦断機能なら backend → frontend の順に依存が流れる。
+   - タスクをスライスに割る。このアプリはフロントエンドだけなので、`gitsim`（挙動）→ `missions`（出題）→ UI の順に依存が流れる。
    - 各スライスについて **何を作るか / どのディレクトリに触るか / 完了の形** を決める。
    - タスクの `見て確かめること:` を、**どう出力させれば見られるか**に翻訳する
      （何を `.loop/artifacts/<slug>/` に出させるか）。手順10で使う。
@@ -44,7 +44,6 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Task
      書式と粒度は `.claude/skills/tdd/SKILL.md`「テストリストの作り方」。
    - テストリストが作れないスライス（設定・配線・見た目のみ）は、その旨と理由を
      分解結果に明示する。タスク行に `tdd: n/a <理由>` があるかも確認する。
-   - スキーマ変更の有無と `db:` の行き先（postgres | dynamo | none）を確定させる。
    - **ADRの要否を判定する**。基準は `.claude/skills/adr/SKILL.md`
      （後戻りが高い / 選択肢が複数あった判断だけ。命名や規約どおりの実装は対象外）。
      タスク行に `adr: required` があれば必ず書く。要否と**その理由**を分解結果に明示する。
@@ -55,7 +54,6 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Task
 
    | スライス | エージェント | model |
    | --- | --- | --- |
-   | バックエンド（controller / service / repository / migration / JUnit） | `backend-dev` | タスクの `model:`（既定 sonnet） |
    | フロントエンド（component / hook / types / Vitest） | `frontend-dev` | タスクの `model:`（既定 sonnet） |
    | 機械的な作業（TODOコメント削除、リネーム、定型のテスト追加、1ファイルの小修正） | 上の担当と同じ | `model: haiku` |
 
@@ -65,9 +63,8 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Task
      1回目は同じモデルで再試行してよい（指示の不足であることが多い）。
      上げた事実と結果は `done.md` に残す。
 
-   - 依存のあるスライスは**直列**に呼ぶ。backend が返した**実際のDTOの形**を
-     frontend への指示に埋め込む（型ズレは verifier の常連Blocker）。
-     依存が無ければ1回の応答でまとめて呼ぶ。
+   - 依存のあるスライスは**直列**に呼ぶ。先に作った関数の**実際のシグネチャ**を
+     後続への指示に埋め込む。依存が無ければ1回の応答でまとめて呼ぶ。
    - 渡す指示に必ず入れる: スライスの範囲 / **触ってはいけないディレクトリ** /
      読むべき SKILL.md（`tdd` は必ず含める）/ **そのスライスのテストリスト** /
      完了条件（リストの全件が赤→緑を通り、担当範囲のテストが緑）/
@@ -80,13 +77,11 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Task
    - **サブエージェントは文脈を持たない**。タスク名だけ投げない。
      既存コードのシグネチャや実際のレスポンス形は、指示文に**そのまま埋める**。
    - **横道に逸れない**。気づいた別の問題は `.loop/backlog.md` に**追記するだけ**。
-   - `make test` が DB を起動しない制約（`@SpringBootTest` / `@DataJpaTest` 不可）は
-     バックエンドの指示に**毎回**書く。書き忘れると確実に blocked になる。
 
 6. **ADRを書く**（手順4で「要」と判定した場合、**または手順9でADRのBlockerを受けた場合**）
    — **自分で書く。委譲しない。**
 
-   判断はオーケストレータの仕事で、`backend-dev` / `frontend-dev` は
+   判断はオーケストレータの仕事で、`frontend-dev` は
    「判断が要る問題は自分で決めずに報告に上げる」側。ここを渡すとモデル配分が壊れる。
 
    - `.claude/skills/adr/SKILL.md` の書式・採番に従い `docs/adr/NNNN-<kebab>.md` を作る。
@@ -98,8 +93,6 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Task
      入れるため。blocked で枝ごと捨てられたら消えてよい ＝ 採用されなかった判断は決定ではない。
 
 7. **機械ゲート** — `make test && make build`。
-   - **緑を信じる前に `cd <repo>/backend && ./gradlew test --rerun-tasks` で再実行する。**
-     Gradle は UP-TO-DATE で実行をスキップし、古い結果を緑と誤認させる（実際に事故が起きている）。
    - **赤の記録を確かめる**。緑は「テストが機能している」証拠ではない。
 
      ```bash
@@ -111,9 +104,8 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Task
      **verifier に回さずに差し戻す**。既存テストを変更した部分については、
      ミューテーション自己検証の結果（何を壊し、どのテストが落ちたか）を同様に確かめる。
      `tdd: n/a` の周は、その理由が分解結果と一致しているかだけ見る。
-   - スキーマを触った周は、**実機で確認する**。`make restart`（`make backend` は health が
-     応答する限り再起動せず古いコードのまま動く）してから API を叩き、Flyway の適用と
-     `ddl-auto: validate` の通過を確かめる。**これは機械ゲートでは検出できない**。
+   - 画面を触った周は、`make start` で**実機でも確認する**。見た目やアニメーションは
+     機械ゲートでは検出できない。
    - 赤なら**原因を特定するのは自分**。そのうえで、
      - 原因が1〜2行で言い切れる → 自分で直す（往復のほうが高い）
      - それ以外 → 担当エージェントに**何がどう落ちたか**を添えて差し戻す
